@@ -1,7 +1,6 @@
 const images = document.getElementById("gallery");
 const loadMoreButton = document.getElementById("load-more");
 const searchInput = document.getElementById("search");
-const searchButton = document.getElementById("search-button");
 const searchForm = document.getElementById("search-form");
 
 let currentPage = 1;
