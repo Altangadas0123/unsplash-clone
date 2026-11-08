@@ -1,25 +1,35 @@
 const images = document.getElementById("gallery");
 const loadMoreButton = document.getElementById("load-more");
-const search = document.getElementById("search");
+const searchInput = document.getElementById("search");
 const searchButton = document.getElementById("search-button");
 const searchForm = document.getElementById("search-form");
 
 let currentPage = 1;
+let currentSearch = "";
 
 const main = async () => {
-  let response = await fetch(`https://api.unsplash.com/photos?page=${currentPage}`, {
+  
+  let url = `https://api.unsplash.com/photos?page=${currentPage}`;
+
+  if (currentSearch !== "") {
+    url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(currentSearch)}&page=${currentPage}`;
+  }
+
+  let response = await fetch(url, {
     headers: {
-      Authorization: "Client-ID gHEUN05WAX435CJpL33L5TM3abRTeVP5M0uycBmRJlM",
+      Authorization: "Client-ID gHEUN05WAX435CJpL33L5TM3abRTeVP5M0uycBmRJlM", 
     },
   });
 
   if (!response.ok) {
-    throw new Error("Error");
+    throw new Error("Error!");
   }
 
   const result = await response.json();
 
-  result.forEach((photo) => {
+  const photos = currentSearch !== "" ? result.results : result;
+
+  photos.forEach((photo) => {
     const id = photo.id;
     const imageUrl = photo.urls.small;
 
@@ -35,15 +45,21 @@ const main = async () => {
   loadMoreButton.disabled = false;
 };
 
-
 searchForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  console.log("first");
-})
+  const value = searchInput.value.trim();
+  if (value === "") return; 
 
+  currentSearch = value;
+  currentPage = 1;
+  images.innerHTML = "";
+  
+  loadMoreButton.textContent = "loading ...";
+  loadMoreButton.disabled = true;
 
-
+  main();
+});
 
 loadMoreButton.addEventListener("click", async () => {
   currentPage++;
